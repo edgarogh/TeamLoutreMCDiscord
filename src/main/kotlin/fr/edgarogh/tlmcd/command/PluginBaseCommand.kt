@@ -1,5 +1,6 @@
-package fr.edgarogh.tlmcd
+package fr.edgarogh.tlmcd.command
 
+import fr.edgarogh.tlmcd.TLMCDPlugin
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender

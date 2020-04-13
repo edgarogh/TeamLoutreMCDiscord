@@ -1,5 +1,6 @@
 package fr.edgarogh.tlmcd
 
+import fr.edgarogh.tlmcd.discord.DiscordEvent
 import fr.edgarogh.tlmcd.util.each
 import fr.edgarogh.tlmcd.util.tellRaw
 import fr.edgarogh.tlmcd.util.toBaseComponent

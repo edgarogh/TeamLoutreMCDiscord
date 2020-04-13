@@ -1,5 +1,7 @@
-package fr.edgarogh.tlmcd
+package fr.edgarogh.tlmcd.discord
 
+import fr.edgarogh.tlmcd.Disposable
+import fr.edgarogh.tlmcd.RemoteMessage
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.ChannelType
 import net.dv8tion.jda.api.entities.Message
@@ -24,12 +26,13 @@ class DiscordClient(apiKey: String, private val watchedChannelId: String) : Disp
     }
 
     private fun handleTransfer(discordMessage: Message) {
-        eventQueue += DiscordEvent.IncomingMessage(RemoteMessage(
-            discordMessage.author.id,
-            discordMessage.author.name + "#" + discordMessage.author.discriminator,
-            discordMessage.contentRaw,
-            discordMessage.attachments.filter { it.isImage }.map { it.fileName to it.url }.toSet()
-        )
+        eventQueue += DiscordEvent.IncomingMessage(
+            RemoteMessage(
+                discordMessage.author.id,
+                discordMessage.author.name + "#" + discordMessage.author.discriminator,
+                discordMessage.contentRaw,
+                discordMessage.attachments.filter { it.isImage }.map { it.fileName to it.url }.toSet()
+            )
         )
     }
 

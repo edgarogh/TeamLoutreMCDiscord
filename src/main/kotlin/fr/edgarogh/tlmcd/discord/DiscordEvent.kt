@@ -1,4 +1,6 @@
-package fr.edgarogh.tlmcd
+package fr.edgarogh.tlmcd.discord
+
+import fr.edgarogh.tlmcd.RemoteMessage
 
 sealed class DiscordEvent {
 

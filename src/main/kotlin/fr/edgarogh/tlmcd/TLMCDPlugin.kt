@@ -1,5 +1,7 @@
 package fr.edgarogh.tlmcd
 
+import fr.edgarogh.tlmcd.command.PluginBaseCommand
+import fr.edgarogh.tlmcd.discord.DiscordClient
 import org.bukkit.plugin.java.JavaPlugin
 
 class TLMCDPlugin() : JavaPlugin() {
