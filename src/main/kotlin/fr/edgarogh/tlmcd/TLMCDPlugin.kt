@@ -3,13 +3,14 @@ package fr.edgarogh.tlmcd
 import fr.edgarogh.tlmcd.command.DiscordSayCommand
 import fr.edgarogh.tlmcd.command.PluginBaseCommand
 import fr.edgarogh.tlmcd.discord.DiscordClient
+import fr.edgarogh.tlmcd.images.ViewImageService
 import org.bukkit.plugin.java.JavaPlugin
 
 class TLMCDPlugin() : JavaPlugin() {
 
     val linkService = LinkService()
     val userLookupTable = UserLookupTable()
-
+    var viewImageService: ViewImageService? = null
     var discordClient: DiscordClient? = null
 
     private val lookupTableFile by lazy {
@@ -35,6 +36,12 @@ class TLMCDPlugin() : JavaPlugin() {
 
     override fun onEnable() {
         saveDefaultConfig()
+
+        val protocolLib = server.pluginManager.getPlugin("ProtocolLib")
+        if (protocolLib != null) {
+            viewImageService = ViewImageService(this)
+            server.pluginManager.registerEvents(viewImageService!!, this)
+        }
 
         PluginListener(this).let {
             server.scheduler.scheduleSyncRepeatingTask(this, it::onTick, 0, 1)

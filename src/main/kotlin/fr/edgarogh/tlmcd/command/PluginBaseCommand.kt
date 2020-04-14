@@ -19,7 +19,9 @@ class PluginBaseCommand(private val plugin: TLMCDPlugin) : CommandExecutor, TabC
             when (args[0]) {
                 "status" -> {
                     val isConnected = plugin.discordClient != null
+                    val attachmentPreviews = plugin.viewImageService != null
                     sender.sendMessage("$prefix Plugin connected to Discord: $isConnected")
+                    sender.sendMessage("$prefix Image attachments preview available: $attachmentPreviews")
                     sender.sendMessage("$prefix Links: ${plugin.userLookupTable}")
                     true
                 }
@@ -46,7 +48,24 @@ class PluginBaseCommand(private val plugin: TLMCDPlugin) : CommandExecutor, TabC
                     true
                 }
                 "view-image" -> {
-                    sender.sendMessage("$prefix Not implemented. URL: ${args[1]}")
+                    val viewImageService = plugin.viewImageService
+
+                    when {
+                        args.size != 2 -> {
+                            sender.sendMessage("Missing operand: URL")
+                        }
+                        viewImageService == null -> {
+                            sender.sendMessage("View image service not available. ProtocolLib might not be installed.")
+                        }
+                        sender is Player -> {
+                            val url = args[1]
+                            viewImageService.showImage(sender, url)
+                        }
+                        else -> {
+                            sender.sendMessage("I can't show you an image...")
+                        }
+                    }
+
                     true
                 }
                 else -> false
