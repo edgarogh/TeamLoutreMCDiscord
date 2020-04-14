@@ -21,9 +21,12 @@ class UserLookupTable() {
         map[discordUserId] = minecraftPlayer
     }
 
-    fun getMinecraftPlayer(discordUserId: String): OfflinePlayer? {
-        return map[discordUserId]
-    }
+    fun getMinecraftPlayer(discordUserId: String) = map[discordUserId]
+
+    fun getDiscordId(player: OfflinePlayer) = map
+        .filterValues { it.uniqueId == player.uniqueId }
+        .keys
+        .firstOrNull()
 
     fun serialize() = map.entries.joinToString("\n") { (discordId, player) -> "$discordId,${player.uniqueId}" }
 

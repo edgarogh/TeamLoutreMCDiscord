@@ -1,5 +1,6 @@
 package fr.edgarogh.tlmcd
 
+import fr.edgarogh.tlmcd.command.DiscordSayCommand
 import fr.edgarogh.tlmcd.command.PluginBaseCommand
 import fr.edgarogh.tlmcd.discord.DiscordClient
 import org.bukkit.plugin.java.JavaPlugin
@@ -43,6 +44,11 @@ class TLMCDPlugin() : JavaPlugin() {
         getCommand("teamloutre-discord")!!.apply {
             setExecutor(tldExecutor)
             tabCompleter = tldExecutor
+        }
+
+        val discordSayExecutor = DiscordSayCommand(this)
+        getCommand("dsay")!!.apply {
+            setExecutor(discordSayExecutor)
         }
 
         loadConfig()

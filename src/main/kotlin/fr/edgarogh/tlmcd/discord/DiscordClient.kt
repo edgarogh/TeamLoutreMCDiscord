@@ -10,9 +10,10 @@ import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.EventListener
+import org.bukkit.Bukkit
 import java.util.concurrent.ConcurrentLinkedQueue
 
-class DiscordClient(apiKey: String, private val watchedChannelId: String) : Disposable, EventListener {
+class DiscordClient(apiKey: String, private val channelId: String) : Disposable, EventListener {
 
     val eventQueue = ConcurrentLinkedQueue<DiscordEvent>()
 
@@ -45,13 +46,15 @@ class DiscordClient(apiKey: String, private val watchedChannelId: String) : Disp
                 }
             }
             is MessageReceivedEvent -> {
+                if (e.message.author.idLong == jda.selfUser.idLong) return
+
                 val discordMessage = e.message
                 when (discordMessage.channelType) {
                     ChannelType.PRIVATE -> {
                         handleLinkRequest(discordMessage.author, discordMessage.contentRaw.trim())
                     }
                     ChannelType.TEXT -> {
-                        if (discordMessage.channel.id == watchedChannelId) {
+                        if (discordMessage.channel.id == channelId) {
                             handleTransfer(discordMessage)
                         }
                     }
@@ -61,6 +64,33 @@ class DiscordClient(apiKey: String, private val watchedChannelId: String) : Disp
                 }
             }
         }
+    }
+
+    /**
+     * Sends a message in the configured text channel
+     * @param noMention When `true`, sends a message, then edits it, in order not to ping mentioned user(s)
+     */
+    fun sendPublicMessage(content: String, noMention: Boolean = false): Boolean {
+        val channel = jda.guilds.firstOrNull()?.getTextChannelById(channelId)
+
+        if (channel == null) {
+            Bukkit.getLogger().warning("Bot not connected or bad Discord channel ID provided")
+            return false
+        }
+
+        if (!noMention || '@' !in content) {
+            channel
+                .sendMessage(content)
+                .queue()
+        }
+        else {
+            channel
+                .sendMessage(content.replace("@", "@ "))
+                .flatMap { it.editMessage(content) }
+                .queue()
+        }
+
+        return true
     }
 
     fun sendPrivateMessage(discordUserId: String, message: String) {

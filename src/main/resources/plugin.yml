@@ -1,3 +1,5 @@
 commands:
   teamloutre-discord:
     usage: /teamloutre-discord <status|link|reload|view-image>
+  dsay:
+    usage: /dsay [message]
