@@ -66,7 +66,8 @@ class DiscordClient(apiKey: String, private val watchedChannelId: String) : Disp
     fun sendPrivateMessage(discordUserId: String, message: String) {
         jda.retrieveUserById(discordUserId)
             .flatMap { it.openPrivateChannel() }
-            .queue { it.sendMessage(message) }
+            .flatMap { it.sendMessage(message) }
+            .queue()
     }
 
     override fun dispose() = jda.shutdown()
