@@ -36,7 +36,9 @@ class ViewingMode(private val plugin: Plugin, private val player: Player, privat
             val newImage = BufferedImage(maxSize, maxSize, image.type)
 
             newImage.graphics.run {
-                drawImage(image, 0, 0, null)
+                val offsetX = (maxSize - image.width) / 2
+                val offsetY = (maxSize - image.height) / 2
+                drawImage(image, offsetX, offsetY, null)
                 dispose()
             }
 
