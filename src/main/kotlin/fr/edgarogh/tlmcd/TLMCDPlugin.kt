@@ -11,6 +11,7 @@ class TLMCDPlugin() : JavaPlugin() {
     val linkService = LinkService()
     val userLookupTable = UserLookupTable()
     var viewImageService: ViewImageService? = null
+    val statusService = StatusService(this)
     var discordClient: DiscordClient? = null
 
     private val lookupTableFile by lazy {
@@ -24,7 +25,7 @@ class TLMCDPlugin() : JavaPlugin() {
         val channelId = config.getString(CONFIG_DISCORD_CHANNEL_ID) ?: return false
 
         try {
-            discordClient = DiscordClient(apiKey, channelId)
+            discordClient = DiscordClient(this, apiKey, channelId)
         }
         catch (e: Exception) {
             e.printStackTrace()
@@ -59,6 +60,9 @@ class TLMCDPlugin() : JavaPlugin() {
         }
 
         loadConfig()
+
+        server.pluginManager.registerEvents(statusService, this)
+        server.scheduler.scheduleSyncRepeatingTask(this, statusService::updateStatus, 0, 5 * 20)
 
         userLookupTable.load(lookupTableFile.readText())
     }

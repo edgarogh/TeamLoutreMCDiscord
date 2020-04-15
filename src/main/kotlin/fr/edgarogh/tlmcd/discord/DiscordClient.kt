@@ -1,19 +1,27 @@
 package fr.edgarogh.tlmcd.discord
 
+import fr.edgarogh.tlmcd.DiscordReadyEvent
 import fr.edgarogh.tlmcd.Disposable
 import fr.edgarogh.tlmcd.RemoteMessage
+import fr.edgarogh.tlmcd.TLMCDPlugin
 import net.dv8tion.jda.api.JDABuilder
+import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.entities.ChannelType
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.GenericEvent
+import net.dv8tion.jda.api.events.ReadyEvent
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.EventListener
 import org.bukkit.Bukkit
 import java.util.concurrent.ConcurrentLinkedQueue
 
-class DiscordClient(apiKey: String, private val channelId: String) : Disposable, EventListener {
+class DiscordClient(
+    private val plugin: TLMCDPlugin,
+    apiKey: String,
+    private val channelId: String
+) : Disposable, EventListener {
 
     val eventQueue = ConcurrentLinkedQueue<DiscordEvent>()
 
@@ -39,6 +47,9 @@ class DiscordClient(apiKey: String, private val channelId: String) : Disposable,
 
     override fun onEvent(e: GenericEvent) {
         when (e) {
+            is ReadyEvent -> plugin.server.scheduler.runTask(plugin) { ->
+                plugin.server.pluginManager.callEvent(DiscordReadyEvent(this))
+            }
             is GuildJoinEvent -> {
                 if (jda.guilds.isNotEmpty()) {
                     e.guild.defaultChannel?.sendMessage("Je ne peux pas être sur plusieurs serveurs à la fois")
@@ -65,6 +76,12 @@ class DiscordClient(apiKey: String, private val channelId: String) : Disposable,
             }
         }
     }
+
+    var status: String
+        get() = jda.presence.activity?.name ?: ""
+        set(value) {
+            jda.presence.activity = Activity.playing(value)
+        }
 
     /**
      * Sends a message in the configured text channel
