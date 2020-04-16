@@ -15,10 +15,12 @@ class PluginListener(private val plugin: TLMCDPlugin) : Listener {
             eventQueue.each { e ->
                 when (e) {
                     is DiscordEvent.IncomingMessage -> {
-                        plugin.server.onlinePlayers.forEach {
-                            val message = e.message.toBaseComponent(plugin.userLookupTable)
-                            it.tellRaw(message)
-                        }
+                        plugin.server.onlinePlayers
+                            .filter { it.tlmcdReceiveOn == 1.toByte() }
+                            .forEach {
+                                val message = e.message.toBaseComponent(plugin.userLookupTable)
+                                it.tellRaw(message)
+                            }
                     }
                     is DiscordEvent.LinkAttempt -> {
                         val player = plugin.linkService.findPlayer(e.token)

@@ -2,6 +2,6 @@ api-version: '1.15'
 softdepend: [ProtocolLib]
 commands:
   teamloutre-discord:
-    usage: /teamloutre-discord <status|link|reload|view-image>
+    usage: /teamloutre-discord <status|link|reload|view-image|on|off>
   dsay:
     usage: /dsay [message]

@@ -1,6 +1,7 @@
 package fr.edgarogh.tlmcd.command
 
 import fr.edgarogh.tlmcd.TLMCDPlugin
+import fr.edgarogh.tlmcd.tlmcdReceiveOn
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -16,13 +17,18 @@ class PluginBaseCommand(private val plugin: TLMCDPlugin) : CommandExecutor, TabC
             false
         }
         else {
-            when (args[0]) {
+            when (val arg0 = args[0]) {
                 "status" -> {
                     val isConnected = plugin.discordClient != null
                     val attachmentPreviews = plugin.viewImageService != null
                     sender.sendMessage("$prefix Plugin connected to Discord: $isConnected")
                     sender.sendMessage("$prefix Image attachments preview available: $attachmentPreviews")
                     sender.sendMessage("$prefix Links: ${plugin.userLookupTable}")
+                    if (sender is Player) {
+                        val enabled = sender.tlmcdReceiveOn == 1.toByte()
+                        sender.sendMessage("$prefix (for you only) Message reception enabled: $enabled")
+                    }
+
                     true
                 }
                 "link" -> {
@@ -68,6 +74,16 @@ class PluginBaseCommand(private val plugin: TLMCDPlugin) : CommandExecutor, TabC
 
                     true
                 }
+                "on", "off" -> {
+                    if (sender is Player) {
+                        sender.tlmcdReceiveOn = if (arg0 == "on") 1 else 0
+                        sender.sendMessage("$prefix Paramètre mis à jour")
+                    }
+                    else {
+                        sender.sendMessage("$prefix Only players can use this command")
+                    }
+                    true
+                }
                 else -> false
             }
         }
@@ -80,7 +96,7 @@ class PluginBaseCommand(private val plugin: TLMCDPlugin) : CommandExecutor, TabC
         args: Array<out String>
     ): MutableList<String> {
         return if (args.size == 1) {
-            mutableListOf("status", "link", "reload", "view-image")
+            mutableListOf("status", "link", "reload", "view-image", "on", "off")
         }
         else when (args[0]) {
             "link" -> {
