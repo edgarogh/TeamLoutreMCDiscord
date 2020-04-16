@@ -9,16 +9,10 @@ import org.bukkit.plugin.java.JavaPlugin
 class TLMCDPlugin() : JavaPlugin() {
 
     val linkService = LinkService()
-    val userLookupTable = UserLookupTable()
+    val userLookupTable = UserLookupTable(dataFolder.resolve("lookup.csv"))
     var viewImageService: ViewImageService? = null
     val statusService = StatusService(this)
     var discordClient: DiscordClient? = null
-
-    private val lookupTableFile by lazy {
-        dataFolder.resolve("lookup.csv").apply {
-            if (!exists()) createNewFile()
-        }
-    }
 
     fun loadConfig(): Boolean {
         val apiKey = config.getString(CONFIG_DISCORD_API_KEY) ?: return false
@@ -63,13 +57,11 @@ class TLMCDPlugin() : JavaPlugin() {
 
         server.pluginManager.registerEvents(statusService, this)
         server.scheduler.scheduleSyncRepeatingTask(this, statusService::updateStatus, 0, 5 * 20)
-
-        userLookupTable.load(lookupTableFile.readText())
     }
 
     override fun onDisable() {
         discordClient?.dispose()
-        lookupTableFile.writeText(userLookupTable.serialize())
+        userLookupTable.saveAndDestroy()
     }
 
     companion object {
